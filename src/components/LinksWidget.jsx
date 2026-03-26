@@ -15,6 +15,7 @@ const EMOJI_OPTIONS = [
 export default function LinksWidget() {
   const [links, setLinks] = useLocalStorage(STORAGE_KEYS.LINKS, DEFAULT_LINKS)
   const [adding, setAdding] = useState(false)
+  const [editing, setEditing] = useState(false)
   const [newLabel, setNewLabel] = useState('')
   const [newUrl, setNewUrl] = useState('')
   const [newIcon, setNewIcon] = useState('🔗')
@@ -40,6 +41,7 @@ export default function LinksWidget() {
   }
 
   const handleOpen = (url) => {
+    if (editing) return
     window.open(url, '_blank', 'noopener,noreferrer')
   }
 
@@ -84,25 +86,82 @@ export default function LinksWidget() {
           </div>
         </div>
 
-        <motion.button
-          onClick={() => setAdding(!adding)}
-          className="px-4 py-2 rounded-2xl text-xs font-semibold"
-          style={{
-            background: adding
-              ? 'rgba(239,68,68,0.15)'
-              : 'linear-gradient(135deg, rgba(168,85,247,0.2), rgba(236,72,153,0.2))',
-            border: adding
-              ? '1px solid rgba(239,68,68,0.3)'
-              : '1px solid rgba(168,85,247,0.3)',
-            color: adding ? '#f87171' : '#a855f7',
-          }}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          transition={{ type: 'spring', stiffness: 400 }}
-        >
-          {adding ? '✕ Cancel' : '+ Add'}
-        </motion.button>
+        {/* Header buttons */}
+        <div className="flex items-center gap-2">
+
+          {/* Edit/Done toggle */}
+          {links.length > 0 && !adding && (
+            <motion.button
+              onClick={() => setEditing(!editing)}
+              className="px-3 py-2 rounded-2xl text-xs font-semibold"
+              style={{
+                background: editing
+                  ? 'rgba(16,185,129,0.15)'
+                  : 'rgba(255,255,255,0.05)',
+                border: editing
+                  ? '1px solid rgba(16,185,129,0.3)'
+                  : '1px solid rgba(255,255,255,0.1)',
+                color: editing ? '#4ade80' : 'rgba(255,255,255,0.4)',
+              }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: 'spring', stiffness: 400 }}
+            >
+              {editing ? '✓ Done' : '✎ Edit'}
+            </motion.button>
+          )}
+
+          {/* Add button */}
+          <motion.button
+            onClick={() => {
+              setAdding(!adding)
+              setEditing(false)
+            }}
+            className="px-4 py-2 rounded-2xl text-xs font-semibold"
+            style={{
+              background: adding
+                ? 'rgba(239,68,68,0.15)'
+                : 'linear-gradient(135deg, rgba(168,85,247,0.2), rgba(236,72,153,0.2))',
+              border: adding
+                ? '1px solid rgba(239,68,68,0.3)'
+                : '1px solid rgba(168,85,247,0.3)',
+              color: adding ? '#f87171' : '#a855f7',
+            }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: 'spring', stiffness: 400 }}
+          >
+            {adding ? '✕ Cancel' : '+ Add'}
+          </motion.button>
+        </div>
       </div>
+
+      {/* Edit mode banner */}
+      <AnimatePresence>
+        {editing && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden"
+          >
+            <div
+              className="rounded-2xl px-4 py-2.5 flex items-center gap-2"
+              style={{
+                background: 'rgba(239,68,68,0.08)',
+                border: '1px solid rgba(239,68,68,0.2)',
+              }}
+            >
+              <span style={{ fontSize: '14px' }}>🗑️</span>
+              <p className="text-xs font-medium"
+                style={{ color: 'rgba(255,255,255,0.4)' }}>
+                Tap the <span style={{ color: '#f87171' }}>✕</span> on any link to delete it
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Add form */}
       <AnimatePresence>
@@ -196,7 +255,7 @@ export default function LinksWidget() {
       {/* Links grid */}
       <motion.div
         className="grid gap-3"
-        style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))' }}
+        style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))' }}
       >
         <AnimatePresence>
           {links.map((link) => (
@@ -214,52 +273,98 @@ export default function LinksWidget() {
                 onClick={() => handleOpen(link.url)}
                 className="w-full rounded-2xl p-4 flex flex-col items-center gap-2 text-center"
                 style={{
-                  background: 'rgba(255,255,255,0.03)',
-                  border: '1px solid rgba(255,255,255,0.08)',
+                  background: editing
+                    ? 'rgba(239,68,68,0.05)'
+                    : 'rgba(255,255,255,0.03)',
+                  border: editing
+                    ? '1px solid rgba(239,68,68,0.15)'
+                    : '1px solid rgba(255,255,255,0.08)',
+                  cursor: editing ? 'default' : 'pointer',
                 }}
-                whileHover={{
+                whileHover={!editing ? {
                   scale: 1.05,
                   background: 'rgba(168,85,247,0.1)',
                   borderColor: 'rgba(168,85,247,0.3)',
                   boxShadow: '0 0 20px rgba(168,85,247,0.15)',
-                }}
-                whileTap={{ scale: 0.97 }}
+                } : {}}
+                whileTap={!editing ? { scale: 0.97 } : {}}
                 transition={{ type: 'spring', stiffness: 400 }}
               >
-                <span style={{ fontSize: '26px' }}>{link.icon}</span>
+                {/* Wiggle when in edit mode */}
+                <motion.span
+                  style={{ fontSize: '26px' }}
+                  animate={editing ? {
+                    rotate: [-1, 1, -1],
+                    transition: { repeat: Infinity, duration: 0.4 }
+                  } : { rotate: 0 }}
+                >
+                  {link.icon}
+                </motion.span>
                 <span
                   className="text-xs font-semibold truncate w-full"
-                  style={{ color: 'rgba(255,255,255,0.7)' }}
+                  style={{ color: editing
+                    ? 'rgba(255,255,255,0.4)'
+                    : 'rgba(255,255,255,0.7)'
+                  }}
                 >
                   {link.label}
                 </span>
               </motion.button>
 
-              {/* Delete button — appears on hover */}
-              <motion.button
-                onClick={() => handleDelete(link.id)}
-                className="absolute -top-1.5 -right-1.5 rounded-full flex items-center justify-center"
-                style={{
-                  width: '20px',
-                  height: '20px',
-                  background: 'rgba(239,68,68,0.8)',
-                  color: '#fff',
-                  fontSize: '10px',
-                  opacity: 0,
-                }}
-                whileHover={{ scale: 1.2, opacity: 1 }}
-                animate={{ opacity: 0 }}
-                whileFocus={{ opacity: 1 }}
-              >
-                ✕
-              </motion.button>
+              {/* Delete button */}
+              <AnimatePresence>
+                {editing && (
+                  <motion.button
+                    onClick={() => handleDelete(link.id)}
+                    className="absolute -top-1.5 -right-1.5 rounded-full flex items-center justify-center"
+                    style={{
+                      width: '22px',
+                      height: '22px',
+                      background: '#ef4444',
+                      color: '#fff',
+                      fontSize: '11px',
+                      fontWeight: 'bold',
+                      boxShadow: '0 0 8px rgba(239,68,68,0.6)',
+                    }}
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0, opacity: 0 }}
+                    transition={{ type: 'spring', stiffness: 500 }}
+                    whileHover={{ scale: 1.2 }}
+                    whileTap={{ scale: 0.9 }}
+                  >
+                    ✕
+                  </motion.button>
+                )}
+              </AnimatePresence>
 
-              {/* CSS hover trick for delete button */}
-              <style>{`
-                .group:hover button:last-child {
-                  opacity: 1 !important;
-                }
-              `}</style>
+              {/* Desktop hover delete — only shows when NOT in edit mode */}
+              {!editing && (
+                <motion.button
+                  onClick={() => handleDelete(link.id)}
+                  className="absolute -top-1.5 -right-1.5 rounded-full flex items-center justify-center"
+                  style={{
+                    width: '20px',
+                    height: '20px',
+                    background: 'rgba(239,68,68,0.8)',
+                    color: '#fff',
+                    fontSize: '10px',
+                    opacity: 0,
+                  }}
+                  whileHover={{ scale: 1.2, opacity: 1 }}
+                  whileFocus={{ opacity: 1 }}
+                >
+                  ✕
+                </motion.button>
+              )}
+
+              {!editing && (
+                <style>{`
+                  .group:hover button:last-child {
+                    opacity: 1 !important;
+                  }
+                `}</style>
+              )}
             </motion.div>
           ))}
         </AnimatePresence>
