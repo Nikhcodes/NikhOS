@@ -5,115 +5,172 @@
 <img src="https://img.shields.io/badge/Vite-6-646CFF?style=for-the-badge&logo=vite&logoColor=white" />
 <img src="https://img.shields.io/badge/Tailwind_CSS-v4-38BDF8?style=for-the-badge&logo=tailwindcss&logoColor=white" />
 <img src="https://img.shields.io/badge/Framer_Motion-✓-ec4899?style=for-the-badge" />
+<img src="https://img.shields.io/badge/JavaScript-ES6-F7DF1E?style=for-the-badge&logo=javascript&logoColor=yellow" />
 
 <br />
 <br />
 
-# 🎓 NikhOS
+# ✦ NikhOS
 
-### A premium SaaS-level student dashboard — built for focus, designed for excellence.
-
-[🚀 Live Demo](https://nikh-os-red.vercel.app) · [📦 Repo](https://github.com/Nikhcodes/NikhOS)
+### a premium student workspace — calm, fast, and intentionally minimal
 
 <br />
 
-![NikhOS Dashboard Preview]()
-<img width="1535" height="859" alt="HomeDash01" src="https://github.com/user-attachments/assets/3a250d6e-233d-4ca3-9912-4d3e4349714d" />
-<img width="1534" height="688" alt="HomeDash02" src="https://github.com/user-attachments/assets/384a29fa-ff98-472d-9427-f6dfed5d3f41" />
+<p>
+  <a href="https://nikh-os-red.vercel.app"><b>live demo ↗</b></a>
+  &nbsp;&nbsp;&nbsp;
+  <a href="https://github.com/Nikhcodes/NikhOS"><b>repository</b></a>
+</p>
 
+<br />
+
+<img width="1533" height="863" alt="DashBoard-01" src="https://github.com/user-attachments/assets/564e57b3-f783-4a58-b51f-dbccea447535" />
+<img width="1531" height="690" alt="Dashboard-02" src="https://github.com/user-attachments/assets/561c0358-fccd-4c00-ad8a-2343885e15ba" />
+
+
+<br />
+
+<sub>designed to feel like an app, not a webpage</sub>
 
 </div>
 
 ---
 
-## ✨ Features
+<br />
 
-| Widget | Description |
-|---|---|
-| 📊 **Grade Tracker** | Animated average grade with pass/fail indicator |
-| 📚 **Subjects** | Add, edit, delete subjects with color coding |
-| ✅ **Assignments** | Task manager with priority levels and urgency glow |
-| 📅 **Calendar** | Upcoming tests and events with countdown |
-| 🔗 **Quick Links** | Personal bookmark bar with emoji icons |
-| ⏱️ **Study Timer** | Pomodoro timer with animated progress ring |
-| 🧠 **Insights** | Productivity score, completion rate, grade trends |
+## ✦ a different kind of dashboard
 
----
+most tools add more
 
-## 🎨 Design System
+nikhos removes everything that gets in your way
 
-- **Background:** Pure black `#000000`
-- **Cards:** Glass morphism — `bg-white/5` + `backdrop-blur-xl` + subtle borders
-- **Accent:** Pink → Purple gradients throughout
-- **Typography:** Inter font — clean Apple-style UI
-- **Animations:** Framer Motion everywhere — staggered entrances, spring buttons, animated counters
+<br />
+
+> you open it — and instantly know what matters
 
 ---
 
-## 🛠️ Tech Stack
+## ✦ built for
 
-- **[Vite](https://vitejs.dev/)** — lightning fast build tool
-- **[React 18](https://react.dev/)** — component-based UI
-- **[Tailwind CSS v4](https://tailwindcss.com/)** — utility-first styling
-- **[Framer Motion](https://www.framer.com/motion/)** — production-grade animations
-- **LocalStorage** — zero-backend persistence
+```
+students who hate clutter
+people who like dark, quiet interfaces
+anyone who wants focus without friction
+```
+
+<sub>if you’ve ever opened 5 tabs just to “get organized” — this replaces that</sub>
 
 ---
 
-## 🚀 Getting Started
+## ✦ core system
+
+<div align="center">
+
+```
+┌──────────────┐   ┌──────────────┐   ┌──────────────┐
+│   grades     │   │  assignments │   │   calendar   │
+│  signal >    │   │  urgency ↑   │   │   time flow  │
+└──────────────┘   └──────────────┘   └──────────────┘
+
+┌──────────────┐   ┌──────────────┐   ┌──────────────┐
+│  subjects    │   │   focus      │   │   insights   │
+│  structure   │   │   deep work  │   │   feedback   │
+└──────────────┘   └──────────────┘   └──────────────┘
+```
+
+</div>
+
+<sub>everything connects — nothing feels isolated</sub>
+
+---
+
+## ✦ visual language
+
+* pure black canvas
+* glass layers with depth, not noise
+* gradients used like accents, not decoration
+* motion that responds to *you*
+
+<br />
+
+<sub>every pixel has a reason to exist</sub>
+
+---
+
+## ✦ installable
+
+nikhos behaves like a native app
+
+```
+open → install → done
+```
+
+* launches from your home screen
+* works offline
+* zero accounts, zero sync
+
+<sub>your data stays on your device — always</sub>
+
+---
+
+## ✦ stack
+
 ```bash
-# Clone the repo
+react 18  ·  vite 6  ·  tailwind v4  
+framer motion  ·  localstorage · JavaScript ES6+
+```
+
+<sub>small stack → fast experience → no overhead</sub>
+
+---
+
+## ✦ local setup
+
+```bash
 git clone https://github.com/Nikhcodes/NikhOS.git
-
-# Navigate into the project
 cd NikhOS
-
-# Install dependencies
 npm install
-
-# Start the dev server
 npm run dev
 ```
 
-Then open [http://localhost:5173](http://localhost:5173) in your browser.
+<sub>runs instantly — no config needed</sub>
 
 ---
 
-## 📁 Project Structure
-```
+## ✦ structure
+
+```bash
 src/
-├── components/
-│   ├── Header.jsx
-│   ├── GradeWidget.jsx
-│   ├── SubjectsWidget.jsx
-│   ├── AssignmentsWidget.jsx
-│   ├── CalendarWidget.jsx
-│   ├── LinksWidget.jsx
-│   ├── StudyTimer.jsx
-│   └── InsightsWidget.jsx
-├── hooks/
-│   └── useLocalStorage.js
-├── utils/
-│   └── storage.js
-├── App.jsx
-├── main.jsx
-└── index.css
+├── components   # UI building blocks
+├── hooks        # state logic
+├── utils        # persistence + helpers
+└── core         # app entry
 ```
+
+<sub>kept simple on purpose</sub>
 
 ---
 
-## 📱 Responsive
+## ✦ design principle
 
-| Breakpoint | Layout |
-|---|---|
-| Mobile `< 768px` | Single column stack + hamburger drawer |
-| Tablet `768px–1023px` | Two column grid |
-| Desktop `1024px+` | Premium 3-column intentional layout |
+> clarity over features
+> flow over complexity
+> feel over noise
+
+---
+
+## ✦
+
+this isn’t trying to be everything
+
+just the one tab you don’t close
 
 ---
 
 <div align="center">
 
-Built by [Nikh](https://github.com/Nikhcodes) · Powered by caffeine and Framer Motion ☕
+<br />
+
+✦ built by nikh <sub>with intention</sub>
 
 </div>
