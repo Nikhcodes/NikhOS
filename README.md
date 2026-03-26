@@ -18,6 +18,9 @@
 <br />
 
 ![NikhOS Dashboard Preview]()
+<img width="1535" height="859" alt="HomeDash01" src="https://github.com/user-attachments/assets/3a250d6e-233d-4ca3-9912-4d3e4349714d" />
+<img width="1534" height="688" alt="HomeDash02" src="https://github.com/user-attachments/assets/384a29fa-ff98-472d-9427-f6dfed5d3f41" />
+
 
 </div>
 
