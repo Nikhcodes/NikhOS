@@ -7,7 +7,7 @@ export const STORAGE_KEYS = {
 
 export const DEFAULT_SUBJECTS = [
   { id: '1', name: 'PR + SD',  grade: 6.3, color: '#a855f7' },
-  { id: '2', name: 'Front-Backend Development',      grade: 6.4, color: '#ec4899' },
+  { id: '2', name: 'FD + BD',      grade: 6.4, color: '#ec4899' },
 ]
 
 export const DEFAULT_ASSIGNMENTS = [
