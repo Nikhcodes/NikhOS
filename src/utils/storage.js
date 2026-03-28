@@ -6,29 +6,43 @@ export const STORAGE_KEYS = {
 }
 
 export const DEFAULT_SUBJECTS = [
-  { id: '1', name: 'DevOps',  grade: 7.5, color: '#a855f7' },
-  { id: '2', name: 'Front-Backend Development',      grade: 6.0, color: '#ec4899' },
+  { id: '1', name: 'PR + SD',  grade: 6.3, color: '#a855f7' },
+  { id: '2', name: 'Front-Backend Development',      grade: 6.4, color: '#ec4899' },
 ]
 
 export const DEFAULT_ASSIGNMENTS = [
   {
     id: '1',
-    title: 'Beroepsprodukt',
-    dueDate: '2026-03-13',
-    priority: 'high',
-    completed: true,
+    title: 'Stageplan',
+    dueDate: '2027-01-15',
+    priority: 'low',
+    completed: false,
   },
   {
     id: '2',
-    title: 'Reflectieverslag',
-    dueDate: '2026-03-28',
+    title: 'PvA SS BP',
+    dueDate: '2026-04-20',
     priority: 'medium',
-    completed: true,
+    completed: false,
   },
   {
     id: '3',
-    title: 'Stageplan',
-    dueDate: '2027-01-15',
+    title: 'Presentatie BP SS',
+    dueDate: '2026-05-25',
+    priority: 'medium',
+    completed: false,
+  },
+  {
+    id: '4',
+    title: 'Individuele bevraging BP SS',
+    dueDate: '2026-05-25',
+    priority: 'medium',
+    completed: false,
+  },
+  {
+    id: '5',
+    title: 'Verantwoording Verslag SEM 3 SS (PP)',
+    dueDate: '2026-05-28',
     priority: 'low',
     completed: false,
   },
@@ -44,9 +58,16 @@ export const DEFAULT_LINKS = [
 export const DEFAULT_EVENTS = [
   {
     id: '1',
-    title: 'Software engineering',
-    date: '2026-05-01',
+    title: 'SE - Software Security',
+    date: '2026-06-02',
     type: 'exam',
     color: '#a855f7',
-  }
+  },
+  {
+    id: '2',
+    title: 'SE - Datastructureren & Algoritmen',
+    date: '2026-08-08',
+    type: 'exam',
+    color: '#a855f7',
+  },
 ]
