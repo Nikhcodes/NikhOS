@@ -12,7 +12,11 @@ export default function Auth() {
     setLoading(true)
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: window.location.origin }
+      options: {
+  emailRedirectTo: import.meta.env.DEV
+    ? 'http://localhost:5173'
+    : 'https://nikh-os-red.vercel.app'
+}
     })
     if (!error) setSent(true)
     setLoading(false)
