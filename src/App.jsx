@@ -176,8 +176,9 @@ function Widget({ children, id }) {
 export default function App() {
   const [session, setSession] = useState(null)
   const [authLoading, setAuthLoading] = useState(true)
-
+console.log('session:', session, 'loading:', authLoading)
   useEffect(() => {
+   
     // Get current session on mount
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)

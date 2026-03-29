@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useLocalStorage } from '../hooks/useLocalStorage'
-import { STORAGE_KEYS, DEFAULT_SUBJECTS } from '../utils/storage'
+import { useSubjects } from '../hooks/useSubjects'
 
 const COLORS = [
   '#a855f7', '#ec4899', '#3b82f6', '#f59e0b',
@@ -13,7 +12,7 @@ function generateId() {
 }
 
 export default function SubjectsWidget() {
-  const [subjects, setSubjects] = useLocalStorage(STORAGE_KEYS.SUBJECTS, DEFAULT_SUBJECTS)
+  const [subjects, setSubjects, loading] = useSubjects()
   const [adding, setAdding] = useState(false)
   const [editingId, setEditingId] = useState(null)
   const [newName, setNewName] = useState('')
@@ -193,7 +192,19 @@ export default function SubjectsWidget() {
           </motion.div>
         )}
       </AnimatePresence>
-
+      {loading && (
+      <div className="flex items-center gap-2 py-1">
+        <motion.div
+          className="rounded-full"
+          style={{ width: '6px', height: '6px', background: '#a855f7' }}
+          animate={{ opacity: [0.3, 1, 0.3] }}
+          transition={{ duration: 1.2, repeat: Infinity }}
+        />
+        <span className="text-xs" style={{ color: 'rgba(255,255,255,0.2)' }}>
+          Syncing...
+        </span>
+      </div>
+    )}
       {/* Subject list */}
       <div className="flex flex-col gap-2">
         <AnimatePresence>

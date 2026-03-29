@@ -1,7 +1,6 @@
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion'
 import { useEffect, useState } from 'react'
-import { useLocalStorage } from '../hooks/useLocalStorage'
-import { STORAGE_KEYS, DEFAULT_SUBJECTS } from '../utils/storage'
+import { useSubjects } from '../hooks/useSubjects'
 
 function AnimatedNumber({ value, decimals = 1 }) {
   const [display, setDisplay] = useState(0)
@@ -19,7 +18,7 @@ function AnimatedNumber({ value, decimals = 1 }) {
 }
 
 export default function GradeWidget() {
-  const [subjects] = useLocalStorage(STORAGE_KEYS.SUBJECTS, DEFAULT_SUBJECTS)
+  const [subjects] = useSubjects()
 
   const average =
     subjects.length > 0
