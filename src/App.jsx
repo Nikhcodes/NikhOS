@@ -1,5 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { supabase } from './utils/supabase'
+import Auth from './components/Auth'
 import Header from './components/Header'
 import GradeWidget from './components/GradeWidget'
 import SubjectsWidget from './components/SubjectsWidget'
@@ -36,7 +38,7 @@ const NAV_ITEMS = [
   { label: '🧠 Insights',    href: '#insights'     },
 ]
 
-function HamburgerMenu() {
+function HamburgerMenu({ onSignOut }) {
   const [open, setOpen] = useState(false)
 
   return (
@@ -102,6 +104,7 @@ function HamburgerMenu() {
                 style={{ color: 'rgba(255,255,255,0.3)' }}>
                 Navigate
               </p>
+
               {NAV_ITEMS.map((item, i) => (
                 <motion.a
                   key={item.href}
@@ -127,7 +130,28 @@ function HamburgerMenu() {
                   {item.label}
                 </motion.a>
               ))}
-              <div className="mt-auto">
+
+              <div className="mt-auto flex flex-col gap-3">
+                {/* Sign out button */}
+                <motion.button
+                  onClick={() => {
+                    onSignOut()
+                    setOpen(false)
+                  }}
+                  className="w-full px-4 py-3 rounded-2xl text-sm font-medium text-left"
+                  style={{
+                    color: '#f87171',
+                    background: 'rgba(239,68,68,0.08)',
+                    border: '1px solid rgba(239,68,68,0.2)',
+                  }}
+                  whileHover={{
+                    background: 'rgba(239,68,68,0.15)',
+                    x: -4,
+                  }}
+                >
+                  🚪 Sign Out
+                </motion.button>
+
                 <p className="text-xs text-center"
                   style={{ color: 'rgba(255,255,255,0.15)' }}>
                   NikhOS · Student Dashboard
@@ -150,6 +174,54 @@ function Widget({ children, id }) {
 }
 
 export default function App() {
+  const [session, setSession] = useState(null)
+  const [authLoading, setAuthLoading] = useState(true)
+
+  useEffect(() => {
+    // Get current session on mount
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session)
+      setAuthLoading(false)
+    })
+
+    // Listen for auth changes (magic link click, sign out, etc.)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setSession(session)
+        setAuthLoading(false)
+      }
+    )
+
+    return () => subscription.unsubscribe()
+  }, [])
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut()
+    setSession(null)
+  }
+
+  // Loading state
+  if (authLoading) {
+    return (
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{ background: '#000000' }}
+      >
+        <motion.div
+          animate={{ opacity: [0.3, 1, 0.3] }}
+          transition={{ duration: 1.5, repeat: Infinity }}
+          style={{ color: 'rgba(255,255,255,0.4)', fontWeight: 600 }}
+        >
+          Loading NikhOS...
+        </motion.div>
+      </div>
+    )
+  }
+
+  // Not signed in — show auth screen
+  if (!session) return <Auth />
+
+  // Signed in — show dashboard
   return (
     <div className="min-h-screen w-full" style={{ background: '#000000' }}>
 
@@ -165,11 +237,12 @@ export default function App() {
         }}
       />
 
-      <HamburgerMenu />
+      {/* Mobile hamburger — passes sign out down */}
+      <HamburgerMenu onSignOut={handleSignOut} />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
 
-        <Header />
+        <Header session={session} onSignOut={handleSignOut} />
 
         <motion.div
           className="mt-6 sm:mt-8"
@@ -177,30 +250,26 @@ export default function App() {
           initial="hidden"
           animate="visible"
         >
-
-          {/* ── MOBILE & TABLET: simple single column stack ── */}
+          {/* ── MOBILE & TABLET ── */}
           <div className="flex flex-col gap-6 lg:hidden">
             <Widget id="grades">      <GradeWidget />       </Widget>
             <Widget id="assignments"> <AssignmentsWidget /> </Widget>
-            <Widget id="timer">       <StudyTimer />         </Widget>
-            <Widget id="subjects">    <SubjectsWidget />     </Widget>
-            <Widget id="calendar">    <CalendarWidget />     </Widget>
-            <Widget id="links">       <LinksWidget />        </Widget>
-            <Widget id="insights">    <InsightsWidget />     </Widget>
+            <Widget id="timer">       <StudyTimer />        </Widget>
+            <Widget id="subjects">    <SubjectsWidget />    </Widget>
+            <Widget id="calendar">    <CalendarWidget />    </Widget>
+            <Widget id="links">       <LinksWidget />       </Widget>
+            <Widget id="insights">    <InsightsWidget />    </Widget>
           </div>
 
-          {/* ── DESKTOP ONLY: premium intentional layout ── */}
+          {/* ── DESKTOP ── */}
           <div className="hidden lg:flex lg:flex-col gap-6">
-
-            {/* Row 1: Grade (1fr) | Assignments (1.6fr) | Timer (1fr) */}
             <div className="grid gap-6"
               style={{ gridTemplateColumns: '1fr 1.6fr 1fr' }}>
               <Widget id="grades">      <GradeWidget />       </Widget>
               <Widget id="assignments"> <AssignmentsWidget /> </Widget>
-              <Widget id="timer">       <StudyTimer />         </Widget>
+              <Widget id="timer">       <StudyTimer />        </Widget>
             </div>
 
-            {/* Row 2: Subjects (1.4fr) | Calendar (1fr) | Links (1fr) */}
             <div className="grid gap-6"
               style={{ gridTemplateColumns: '1.4fr 1fr 1fr' }}>
               <Widget id="subjects"> <SubjectsWidget /> </Widget>
@@ -208,14 +277,11 @@ export default function App() {
               <Widget id="links">    <LinksWidget />    </Widget>
             </div>
 
-            {/* Row 3: Insights full width */}
             <div className="grid gap-6"
               style={{ gridTemplateColumns: '1fr' }}>
               <Widget id="insights"> <InsightsWidget /> </Widget>
             </div>
-
           </div>
-
         </motion.div>
 
         {/* Footer */}
