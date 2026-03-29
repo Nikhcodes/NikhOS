@@ -1,0 +1,91 @@
+import { useState, useEffect } from 'react'
+import { supabase } from '../utils/supabase'
+import { DEFAULT_ASSIGNMENTS } from '../utils/storage'
+
+const CACHE_KEY = 'nikhos_assignments'
+
+export function useAssignments() {
+  const [assignments, setAssignmentsState] = useState(() => {
+    try {
+      const cached = localStorage.getItem(CACHE_KEY)
+      return cached ? JSON.parse(cached) : DEFAULT_ASSIGNMENTS
+    } catch {
+      return DEFAULT_ASSIGNMENTS
+    }
+  })
+  const [loading, setLoading] = useState(true)
+  const [userId, setUserId] = useState(null)
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) setUserId(session.user.id)
+    })
+  }, [])
+
+  useEffect(() => {
+    if (!userId) return
+
+    supabase
+      .from('assignments')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: true })
+      .then(({ data, error }) => {
+        if (error) {
+          console.error('Error fetching assignments:', error)
+          setLoading(false)
+          return
+        }
+        if (data && data.length > 0) {
+          const normalized = data.map((a) => ({
+            id: a.id,
+            title: a.title,
+            dueDate: a.due_date,
+            priority: a.priority,
+            completed: a.completed,
+          }))
+          setAssignmentsState(normalized)
+          localStorage.setItem(CACHE_KEY, JSON.stringify(normalized))
+        }
+        setLoading(false)
+      })
+  }, [userId])
+
+  const setAssignments = async (newAssignments) => {
+    setAssignmentsState(newAssignments)
+    localStorage.setItem(CACHE_KEY, JSON.stringify(newAssignments))
+
+    if (!userId) return
+
+    const { error: deleteError } = await supabase
+      .from('assignments')
+      .delete()
+      .eq('user_id', userId)
+
+    if (deleteError) {
+      console.error('Error deleting assignments:', deleteError)
+      return
+    }
+
+    if (newAssignments.length === 0) return
+
+    const rows = newAssignments.map((a) => ({
+      id: a.id,
+      user_id: userId,
+      title: a.title,
+      due_date: a.dueDate,
+      priority: a.priority,
+      completed: a.completed,
+    }))
+
+    const { error: insertError } = await supabase
+      .from('assignments')
+      .insert(rows)
+
+    if (insertError) {
+      console.error('Error inserting assignments:', insertError)
+    }
+  }
+
+  return [assignments, setAssignments, loading]
+}

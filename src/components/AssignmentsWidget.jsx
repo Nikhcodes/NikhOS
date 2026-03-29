@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useLocalStorage } from '../hooks/useLocalStorage'
-import { STORAGE_KEYS, DEFAULT_ASSIGNMENTS } from '../utils/storage'
+import { useAssignments } from '../hooks/useAssignments'
 
 const PRIORITIES = {
   high:   { label: 'High',   color: '#ef4444', bg: 'rgba(239,68,68,0.15)',   border: 'rgba(239,68,68,0.3)'   },
@@ -48,10 +47,7 @@ function DueDateLabel({ dateStr }) {
 }
 
 export default function AssignmentsWidget() {
-  const [assignments, setAssignments] = useLocalStorage(
-    STORAGE_KEYS.ASSIGNMENTS,
-    DEFAULT_ASSIGNMENTS
-  )
+  const [assignments, setAssignments, loading] = useAssignments()
   const [adding, setAdding] = useState(false)
   const [newTitle, setNewTitle] = useState('')
   const [newDate, setNewDate] = useState('')
@@ -259,7 +255,19 @@ export default function AssignmentsWidget() {
           </motion.div>
         )}
       </AnimatePresence>
-
+          {loading && (
+      <div className="flex items-center gap-2 py-1">
+        <motion.div
+          className="rounded-full"
+          style={{ width: '6px', height: '6px', background: '#a855f7' }}
+          animate={{ opacity: [0.3, 1, 0.3] }}
+          transition={{ duration: 1.2, repeat: Infinity }}
+        />
+        <span className="text-xs" style={{ color: 'rgba(255,255,255,0.2)' }}>
+          Syncing...
+        </span>
+      </div>
+    )}
       {/* Filter tabs */}
       <div
         className="flex rounded-2xl p-1 gap-1"
