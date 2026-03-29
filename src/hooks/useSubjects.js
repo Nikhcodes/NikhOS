@@ -4,7 +4,7 @@ import { DEFAULT_SUBJECTS } from '../utils/storage'
 
 const CACHE_KEY = 'nikhos_subjects'
 
-export function useSubjects() {
+export function useSubjects(userId) {
   const [subjects, setSubjectsState] = useState(() => {
     try {
       const cached = localStorage.getItem(CACHE_KEY)
@@ -14,27 +14,11 @@ export function useSubjects() {
     }
   })
   const [loading, setLoading] = useState(true)
-  const [userId, setUserId] = useState(null)
-  const userIdRef = useRef(null)
+  const userIdRef = useRef(userId)
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        setUserId(session.user.id)
-        userIdRef.current = session.user.id
-      }
-    })
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        const id = session?.user?.id ?? null
-        setUserId(id)
-        userIdRef.current = id
-      }
-    )
-
-    return () => subscription.unsubscribe()
-  }, [])
+    userIdRef.current = userId
+  }, [userId])
 
   useEffect(() => {
     if (!userId) return

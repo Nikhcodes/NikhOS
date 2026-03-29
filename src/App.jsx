@@ -195,7 +195,8 @@ console.log('session:', session, 'loading:', authLoading)
 
     return () => subscription.unsubscribe()
   }, [])
-
+  
+  const userId = session?.user?.id ?? null
   const handleSignOut = async () => {
     await supabase.auth.signOut()
     setSession(null)
@@ -253,22 +254,20 @@ console.log('session:', session, 'loading:', authLoading)
         >
           {/* ── MOBILE & TABLET ── */}
           <div className="flex flex-col gap-6 lg:hidden">
-            <Widget id="grades">      <GradeWidget />       </Widget>
-            <Widget id="assignments"> <AssignmentsWidget /> </Widget>
-            <Widget id="timer">       <StudyTimer />        </Widget>
-            <Widget id="subjects">    <SubjectsWidget />    </Widget>
-            <Widget id="calendar">    <CalendarWidget />    </Widget>
-            <Widget id="links">       <LinksWidget />       </Widget>
-            <Widget id="insights">    <InsightsWidget />    </Widget>
+            <GradeWidget userId={userId} />
+            <SubjectsWidget userId={userId} />
+            <AssignmentsWidget userId={userId} />
+            <InsightsWidget userId={userId} />
           </div>
 
           {/* ── DESKTOP ── */}
           <div className="hidden lg:flex lg:flex-col gap-6">
             <div className="grid gap-6"
               style={{ gridTemplateColumns: '1fr 1.6fr 1fr' }}>
-              <Widget id="grades">      <GradeWidget />       </Widget>
-              <Widget id="assignments"> <AssignmentsWidget /> </Widget>
-              <Widget id="timer">       <StudyTimer />        </Widget>
+              <GradeWidget userId={userId} />
+              <SubjectsWidget userId={userId} />
+              <AssignmentsWidget userId={userId} />
+              <InsightsWidget userId={userId} />
             </div>
 
             <div className="grid gap-6"

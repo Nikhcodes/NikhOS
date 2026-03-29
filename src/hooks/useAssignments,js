@@ -4,7 +4,7 @@ import { DEFAULT_ASSIGNMENTS } from '../utils/storage'
 
 const CACHE_KEY = 'nikhos_assignments'
 
-export function useAssignments() {
+export function useAssignments(userId) {
   const [assignments, setAssignmentsState] = useState(() => {
     try {
       const cached = localStorage.getItem(CACHE_KEY)
@@ -14,30 +14,14 @@ export function useAssignments() {
     }
   })
   const [loading, setLoading] = useState(true)
-  const [userId, setUserId] = useState(null)
-  const userIdRef = useRef(null) // 👈 ref so setAssignments always has latest value
+  const userIdRef = useRef(userId)
 
+  // Keep ref in sync
   useEffect(() => {
-    // Get session immediately
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        setUserId(session.user.id)
-        userIdRef.current = session.user.id
-      }
-    })
+    userIdRef.current = userId
+  }, [userId])
 
-    // Also listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        const id = session?.user?.id ?? null
-        setUserId(id)
-        userIdRef.current = id
-      }
-    )
-
-    return () => subscription.unsubscribe()
-  }, [])
-
+  // Fetch from Supabase when userId is available
   useEffect(() => {
     if (!userId) return
 
@@ -68,9 +52,8 @@ export function useAssignments() {
   }, [userId])
 
   const setAssignments = async (newAssignments) => {
-    // Always read from ref — never stale
     const currentUserId = userIdRef.current
-    console.log('saving with userId:', currentUserId)
+    console.log('saving assignments with userId:', currentUserId)
 
     setAssignmentsState(newAssignments)
     localStorage.setItem(CACHE_KEY, JSON.stringify(newAssignments))

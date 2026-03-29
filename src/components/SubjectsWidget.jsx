@@ -11,8 +11,8 @@ function generateId() {
   return Date.now().toString()
 }
 
-export default function SubjectsWidget() {
-  const [subjects, setSubjects, loading] = useSubjects()
+export default function SubjectsWidget({ userId }) {
+  const [subjects, setSubjects, loading] = useSubjects(userId)
   const [adding, setAdding] = useState(false)
   const [editingId, setEditingId] = useState(null)
   const [newName, setNewName] = useState('')
@@ -87,7 +87,6 @@ export default function SubjectsWidget() {
           </div>
         </div>
 
-        {/* Add button */}
         <motion.button
           onClick={() => setAdding(!adding)}
           className="px-4 py-2 rounded-2xl text-xs font-semibold"
@@ -154,7 +153,6 @@ export default function SubjectsWidget() {
                 }}
                 onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
               />
-              {/* Color picker */}
               <div className="flex gap-2 flex-wrap">
                 {COLORS.map((color) => (
                   <motion.button
@@ -192,19 +190,22 @@ export default function SubjectsWidget() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Syncing indicator */}
       {loading && (
-      <div className="flex items-center gap-2 py-1">
-        <motion.div
-          className="rounded-full"
-          style={{ width: '6px', height: '6px', background: '#a855f7' }}
-          animate={{ opacity: [0.3, 1, 0.3] }}
-          transition={{ duration: 1.2, repeat: Infinity }}
-        />
-        <span className="text-xs" style={{ color: 'rgba(255,255,255,0.2)' }}>
-          Syncing...
-        </span>
-      </div>
-    )}
+        <div className="flex items-center gap-2 py-1">
+          <motion.div
+            className="rounded-full"
+            style={{ width: '6px', height: '6px', background: '#a855f7' }}
+            animate={{ opacity: [0.3, 1, 0.3] }}
+            transition={{ duration: 1.2, repeat: Infinity }}
+          />
+          <span className="text-xs" style={{ color: 'rgba(255,255,255,0.2)' }}>
+            Syncing...
+          </span>
+        </div>
+      )}
+
       {/* Subject list */}
       <div className="flex flex-col gap-2">
         <AnimatePresence>
@@ -334,7 +335,8 @@ function SubjectRow({ subject, isEditing, onEdit, onDelete, onSave, onCancel }) 
                 boxShadow: `0 0 8px ${subject.color}80`,
               }}
             />
-            <span className="text-sm font-medium" style={{ color: 'rgba(255,255,255,0.85)' }}>
+            <span className="text-sm font-medium"
+              style={{ color: 'rgba(255,255,255,0.85)' }}>
               {subject.name}
             </span>
           </div>
