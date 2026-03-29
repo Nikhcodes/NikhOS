@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../utils/supabase'
 import { DEFAULT_ASSIGNMENTS } from '../utils/storage'
 
@@ -15,11 +15,27 @@ export function useAssignments() {
   })
   const [loading, setLoading] = useState(true)
   const [userId, setUserId] = useState(null)
+  const userIdRef = useRef(null) // 👈 ref so setAssignments always has latest value
 
   useEffect(() => {
+    // Get session immediately
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) setUserId(session.user.id)
+      if (session?.user) {
+        setUserId(session.user.id)
+        userIdRef.current = session.user.id
+      }
     })
+
+    // Also listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        const id = session?.user?.id ?? null
+        setUserId(id)
+        userIdRef.current = id
+      }
+    )
+
+    return () => subscription.unsubscribe()
   }, [])
 
   useEffect(() => {
@@ -52,18 +68,25 @@ export function useAssignments() {
   }, [userId])
 
   const setAssignments = async (newAssignments) => {
+    // Always read from ref — never stale
+    const currentUserId = userIdRef.current
+    console.log('saving with userId:', currentUserId)
+
     setAssignmentsState(newAssignments)
     localStorage.setItem(CACHE_KEY, JSON.stringify(newAssignments))
 
-    if (!userId) return
+    if (!currentUserId) {
+      console.warn('No userId — skipping Supabase sync')
+      return
+    }
 
     const { error: deleteError } = await supabase
       .from('assignments')
       .delete()
-      .eq('user_id', userId)
+      .eq('user_id', currentUserId)
 
     if (deleteError) {
-      console.error('Error deleting assignments:', deleteError)
+      console.error('Delete error:', deleteError.message)
       return
     }
 
@@ -71,19 +94,24 @@ export function useAssignments() {
 
     const rows = newAssignments.map((a) => ({
       id: a.id,
-      user_id: userId,
+      user_id: currentUserId,
       title: a.title,
       due_date: a.dueDate,
       priority: a.priority,
       completed: a.completed,
     }))
 
-    const { error: insertError } = await supabase
+    console.log('inserting rows:', rows)
+
+    const { data, error: insertError } = await supabase
       .from('assignments')
       .insert(rows)
+      .select()
 
     if (insertError) {
-      console.error('Error inserting assignments:', insertError)
+      console.error('Insert error:', insertError.message, insertError.details)
+    } else {
+      console.log('Insert success:', data)
     }
   }
 
