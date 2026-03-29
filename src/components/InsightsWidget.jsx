@@ -1,11 +1,7 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { useLocalStorage } from '../hooks/useLocalStorage'
-import {
-  STORAGE_KEYS,
-  DEFAULT_SUBJECTS,
-  DEFAULT_ASSIGNMENTS,
-} from '../utils/storage'
+import { useSubjects } from '../hooks/useSubjects'
+import { useAssignments } from '../hooks/useAssignments'
 
 function AnimatedNumber({ value, decimals = 0, suffix = '' }) {
   const [display, setDisplay] = useState(0)
@@ -111,8 +107,8 @@ function StatBar({ label, value, max, color }) {
 }
 
 export default function InsightsWidget() {
-  const [subjects]    = useLocalStorage(STORAGE_KEYS.SUBJECTS,    DEFAULT_SUBJECTS)
-  const [assignments] = useLocalStorage(STORAGE_KEYS.ASSIGNMENTS, DEFAULT_ASSIGNMENTS)
+  const [subjects]    = useSubjects()
+  const [assignments] = useAssignments()
 
   // --- Calculations ---
   const totalAssignments = assignments.length

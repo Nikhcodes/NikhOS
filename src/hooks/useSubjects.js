@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../utils/supabase'
 import { DEFAULT_SUBJECTS } from '../utils/storage'
 
@@ -15,15 +15,27 @@ export function useSubjects() {
   })
   const [loading, setLoading] = useState(true)
   const [userId, setUserId] = useState(null)
+  const userIdRef = useRef(null)
 
-  // Get current user
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) setUserId(session.user.id)
+      if (session?.user) {
+        setUserId(session.user.id)
+        userIdRef.current = session.user.id
+      }
     })
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        const id = session?.user?.id ?? null
+        setUserId(id)
+        userIdRef.current = id
+      }
+    )
+
+    return () => subscription.unsubscribe()
   }, [])
 
-  // Fetch from Supabase in background once we have userId
   useEffect(() => {
     if (!userId) return
 
@@ -52,24 +64,25 @@ export function useSubjects() {
       })
   }, [userId])
 
-  // Save to localStorage + Supabase
   const setSubjects = async (newSubjects) => {
-    // Update state and cache instantly
+    const currentUserId = userIdRef.current
+    console.log('saving subjects with userId:', currentUserId)
+
     setSubjectsState(newSubjects)
     localStorage.setItem(CACHE_KEY, JSON.stringify(newSubjects))
 
-    if (!userId) return
+    if (!currentUserId) {
+      console.warn('No userId — skipping Supabase sync')
+      return
+    }
 
-    // Sync to Supabase in background
-    // Delete all existing subjects for this user then re-insert
-    // This is the simplest approach for a personal dashboard
     const { error: deleteError } = await supabase
       .from('subjects')
       .delete()
-      .eq('user_id', userId)
+      .eq('user_id', currentUserId)
 
     if (deleteError) {
-      console.error('Error deleting subjects:', deleteError)
+      console.error('Delete error:', deleteError.message)
       return
     }
 
@@ -77,18 +90,21 @@ export function useSubjects() {
 
     const rows = newSubjects.map((s) => ({
       id: s.id,
-      user_id: userId,
+      user_id: currentUserId,
       name: s.name,
       grade: Number(s.grade),
       color: s.color,
     }))
 
-    const { error: insertError } = await supabase
+    const { data, error: insertError } = await supabase
       .from('subjects')
       .insert(rows)
+      .select()
 
     if (insertError) {
-      console.error('Error inserting subjects:', insertError)
+      console.error('Insert error:', insertError.message, insertError.details)
+    } else {
+      console.log('Insert success:', data)
     }
   }
 
